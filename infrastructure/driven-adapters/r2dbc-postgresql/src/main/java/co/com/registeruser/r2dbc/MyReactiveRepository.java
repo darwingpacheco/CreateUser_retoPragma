@@ -1,5 +1,6 @@
 package co.com.registeruser.r2dbc;
 
+import co.com.registeruser.model.user.User;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.query.ReactiveQueryByExampleExecutor;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;

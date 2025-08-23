@@ -36,7 +36,13 @@ cors:
 adapter:
   r2dbc-postgresql:
     host: localhost
-    port: 5433
+    port: 5432
     database: createUserPragma
     username: postgres
     password: 1005076148
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    io.r2dbc.postgresql: DEBUG
+    co.com.registeruser: DEBUG
