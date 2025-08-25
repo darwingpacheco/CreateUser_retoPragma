@@ -1,57 +1,57 @@
 package co.com.registeruser.api.GlobalExceptions;
 
+import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.boot.web.reactive.error.ErrorWebExceptionHandler;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.http.server.reactive.ServerHttpResponse;
+import org.springframework.lang.NonNull;
+import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import org.springframework.web.server.WebExceptionHandler;
 import reactor.core.publisher.Mono;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-@RestControllerAdvice
-public class GlobalExceptionHandler implements ErrorWebExceptionHandler {
+@Component
+@Order(-2)
+public class GlobalExceptionHandler implements WebExceptionHandler {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, Throwable ex) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+    @NonNull
+    public Mono<Void> handle(@NonNull ServerWebExchange exchange, @NonNull Throwable ex) {
+        var response = exchange.getResponse();
 
-        if (ex instanceof IllegalArgumentException e) {
-            status = HttpStatus.BAD_REQUEST;
-            errorResponse.put("error", "Bad Request");
+        if (ex instanceof ValidateExceptionHandler vex) {
+            var errors = vex.getError().getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .toList();
 
-            if (e.getMessage() != null && e.getMessage().contains(":")) {
-                var details = Arrays.stream(e.getMessage().split(","))
-                        .map(String::trim)
-                        .map(err -> {
-                            String[] parts = err.split(":", 2);
-                            return Map.of(
-                                    "field", parts[0].trim(),
-                                    "message", parts.length > 1 ? parts[1].trim() : "Invalid value"
-                            );
-                        })
-                        .toList();
-                errorResponse.put("details", details);
-            } else {
-                errorResponse.put("message", e.getMessage());
-            }
+            return writeJson(response, HttpStatus.BAD_REQUEST, Map.of("errors", errors));
         }
 
-        exchange.getResponse().setStatusCode(status);
-        exchange.getResponse().getHeaders().setContentType(MediaType.APPLICATION_JSON);
+        if (ex instanceof ConflictException) {
+            return writeJson(response, HttpStatus.CONFLICT, Map.of("message", ex.getMessage()));
+        }
 
+        return Mono.error(ex);
+    }
+
+    private Mono<Void> writeJson(ServerHttpResponse response, HttpStatus status, Object body) {
+        response.setStatusCode(status);
+        response.getHeaders().setContentType(MediaType.APPLICATION_JSON);
         try {
-            byte[] bytes = objectMapper.writeValueAsBytes(errorResponse);
-            return exchange.getResponse().writeWith(Mono.just(exchange.getResponse()
-                    .bufferFactory().wrap(bytes)));
+            String jsonBody = objectMapper.writeValueAsString(body);
+            var buffer = response.bufferFactory().wrap(jsonBody.getBytes(StandardCharsets.UTF_8));
+            return response.writeWith(Mono.just(buffer));
         } catch (Exception e) {
             return Mono.error(e);
         }
     }
+
 }

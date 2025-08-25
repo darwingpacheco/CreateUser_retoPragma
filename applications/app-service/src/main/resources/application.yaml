@@ -36,7 +36,7 @@ cors:
 adapter:
   r2dbc-postgresql:
     host: localhost
-    port: 5432
+    port: 5433
     database: createUserPragma
     username: postgres
     password: 1005076148

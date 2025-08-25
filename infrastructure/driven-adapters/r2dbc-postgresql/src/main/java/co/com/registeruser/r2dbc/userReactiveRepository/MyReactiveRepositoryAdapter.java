@@ -14,9 +14,9 @@ import reactor.core.publisher.Mono;
 public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         User,
         UserEntity,
-    String,
-    MyReactiveRepository
-> implements UserRepository {
+        String,
+        MyReactiveRepository
+        > implements UserRepository {
 
     private final RolReactiveRepositoryAdapter rolAdapter;
 
@@ -30,17 +30,16 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     @Override
     @Transactional
     public Mono<User> createUser(User user) {
-        return repository.findByCorreoElectronico(user.getCorreoElectronico())
-                .flatMap(existingUser -> Mono.<User>error(
-                        new IllegalArgumentException("El email ya está registrado")
-                ))
-                .switchIfEmpty(
-                        rolAdapter.findById(user.getIdRol())
-                                .switchIfEmpty(Mono.error(new IllegalArgumentException("El rol no existe")))
-                                .flatMap(rol ->
-                                        repository.save(this.toData(user))
-                                                .map(this::toEntity)
-                                )
-                );
+        return this.repository.save(this.toData(user))
+                .map(this::toEntity);
+    }
+
+    @Override
+    @Transactional
+    public Mono<Boolean> userEmailExist(String email) {
+        return this.repository.findByCorreoElectronico(email)
+                .map(this::toEntity)
+                .map(user -> true)
+                .defaultIfEmpty(false);
     }
 }
