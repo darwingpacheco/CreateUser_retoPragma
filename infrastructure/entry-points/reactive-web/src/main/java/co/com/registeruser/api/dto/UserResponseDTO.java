@@ -9,5 +9,6 @@ public record UserResponseDTO(String nombres,
                               String direccion,
                               String telefono,
                               String correoElectronico,
-                              BigDecimal salarioBase) {
+                              BigDecimal salarioBase
+                            ) {
 }

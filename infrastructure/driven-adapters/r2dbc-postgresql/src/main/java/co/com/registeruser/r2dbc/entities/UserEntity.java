@@ -1,4 +1,4 @@
-package co.com.registeruser.r2dbc;
+package co.com.registeruser.r2dbc.entities;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -25,6 +25,9 @@ public class UserEntity {
 
     @Column("correo_electronico")
     private String correoElectronico;
+
+    @Column("id_rol")
+    private int idRol;
 
     @Column("salario_base")
     private BigDecimal salarioBase;

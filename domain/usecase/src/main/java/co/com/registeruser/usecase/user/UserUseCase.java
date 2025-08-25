@@ -11,10 +11,6 @@ public class UserUseCase {
     private final UserRepository userRepository;
 
     public Mono<User> createUser(User user) {
-        return userRepository.findByEmail(user.getCorreoElectronico())
-                .flatMap(existingUser -> Mono.<User>error(
-                        new IllegalArgumentException("El email ya está registrado")
-                ))
-                .switchIfEmpty(userRepository.createUser(user));
+        return userRepository.createUser(user);
     }
 }

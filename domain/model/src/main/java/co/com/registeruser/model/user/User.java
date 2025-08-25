@@ -17,5 +17,6 @@ public class User {
     private String direccion;
     private String telefono;
     private String correoElectronico;
+    private int idRol;
     private BigDecimal salarioBase;
 }
