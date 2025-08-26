@@ -14,12 +14,12 @@ public class UserUseCase {
     private final RolRepository rolRepository;
 
     public Mono<User> createUser(User user) {
-        return userRepository.userEmailExist(user.getCorreoElectronico())
+        return userRepository.getUserByEmail(user.getEmail())
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new ConflictException("El email ya está registrado"));
                     }
-                    return rolRepository.findById(user.getIdRol())
+                    return rolRepository.findRoleById(user.getIdRol())
                             .switchIfEmpty(Mono.error(new ConflictException("El rol no existe")))
                             .flatMap(rol -> userRepository.createUser(user));
                 });

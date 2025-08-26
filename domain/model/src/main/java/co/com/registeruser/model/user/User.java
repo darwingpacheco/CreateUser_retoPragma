@@ -11,12 +11,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private String nombres;
-    private String apellidos;
-    private LocalDate fechaNacimiento;
-    private String direccion;
-    private String telefono;
-    private String correoElectronico;
+    private String name;
+    private String lastName;
+    private LocalDate dateBirth;
+    private String address;
+    private String phone;
+    private String email;
     private int idRol;
-    private BigDecimal salarioBase;
+    private BigDecimal baseSalary;
 }

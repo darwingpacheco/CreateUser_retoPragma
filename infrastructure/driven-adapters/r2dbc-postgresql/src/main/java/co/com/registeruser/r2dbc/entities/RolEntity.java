@@ -10,6 +10,6 @@ public class RolEntity {
 
     @Id
     private Integer id;
-    private String nombre;
-    private String descripcion;
+    private String nameRole;
+    private String descriptionRole;
 }

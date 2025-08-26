@@ -14,21 +14,27 @@ public class UserEntity {
     @Id
     private Long id;
 
-    private String nombres;
-    private String apellidos;
+    @Column("nombres")
+    private String name;
+
+    @Column("apellidos")
+    private String lastName;
 
     @Column("fecha_nacimiento")
-    private LocalDate fechaNacimiento;
+    private LocalDate dateBirth;
 
-    private String direccion;
-    private String telefono;
+    @Column("direccion")
+    private String address;
+
+    @Column("telefono")
+    private String phone;
 
     @Column("correo_electronico")
-    private String correoElectronico;
+    private String email;
 
     @Column("id_rol")
     private int idRol;
 
     @Column("salario_base")
-    private BigDecimal salarioBase;
+    private BigDecimal baseSalary;
 }

@@ -23,7 +23,7 @@ public class RolReactiveRepositoryAdapter extends ReactiveAdapterOperations<
 
     @Override
     @Transactional
-    public Mono<Rol> findById(int idRol) {
+    public Mono<Rol> findRoleById(int idRol) {
         return this.repository.findById(idRol)
                 .map(this::toEntity);
     }

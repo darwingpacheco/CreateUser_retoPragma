@@ -18,13 +18,10 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         MyReactiveRepository
         > implements UserRepository {
 
-    private final RolReactiveRepositoryAdapter rolAdapter;
-
     public MyReactiveRepositoryAdapter(MyReactiveRepository repository,
                                        ObjectMapper mapper,
                                        RolReactiveRepositoryAdapter rolAdapter) {
         super(repository, mapper, d -> mapper.map(d, User.class));
-        this.rolAdapter = rolAdapter;
     }
 
     @Override
@@ -36,7 +33,7 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
 
     @Override
     @Transactional
-    public Mono<Boolean> userEmailExist(String email) {
+    public Mono<Boolean> getUserByEmail(String email) {
         return this.repository.findByCorreoElectronico(email)
                 .map(this::toEntity)
                 .map(user -> true)

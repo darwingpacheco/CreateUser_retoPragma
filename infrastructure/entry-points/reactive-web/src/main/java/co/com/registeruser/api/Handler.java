@@ -16,7 +16,6 @@ public class Handler {
 
     private final UserUseCase userUseCase;
     private final UserMapperDTO userMapperDTO;
-    private final jakarta.validation.Validator validator;
     private final ValidatorsUtils validatorsUtils;
 
     public Mono<ServerResponse> createUser(ServerRequest request) {
@@ -26,3 +25,4 @@ public class Handler {
                 );
     }
 }
+//hacoco

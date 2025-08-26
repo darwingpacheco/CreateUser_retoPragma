@@ -6,6 +6,6 @@ import lombok.*;
 @AllArgsConstructor
 public class Rol {
     private int UniqueId;
-    private String nombre;
-    private String descripcion;
+    private String nameRole;
+    private String descriptionRole;
 }

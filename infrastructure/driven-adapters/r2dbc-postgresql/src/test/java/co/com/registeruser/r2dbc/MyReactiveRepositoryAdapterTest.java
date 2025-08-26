@@ -2,7 +2,6 @@ package co.com.registeruser.r2dbc;
 
 import co.com.registeruser.model.user.User;
 import co.com.registeruser.r2dbc.entities.UserEntity;
-import co.com.registeruser.r2dbc.rolReactiveRepository.RolReactiveRepositoryAdapter;
 import co.com.registeruser.r2dbc.userReactiveRepository.MyReactiveRepository;
 import co.com.registeruser.r2dbc.userReactiveRepository.MyReactiveRepositoryAdapter;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,14 +37,14 @@ class MyReactiveRepositoryAdapterTest {
     @BeforeEach
     void setUp() {
         userDomain = new User();
-        userDomain.setNombres("Juan");
-        userDomain.setApellidos("Pérez");
-        userDomain.setFechaNacimiento(LocalDate.of(1990, 1, 1));
-        userDomain.setDireccion("Calle 123");
-        userDomain.setTelefono("3001234567");
-        userDomain.setCorreoElectronico("juan@test.com");
+        userDomain.setName("Juan");
+        userDomain.setLastName("Pérez");
+        userDomain.setDateBirth(LocalDate.of(1990, 1, 1));
+        userDomain.setAddress("Calle 123");
+        userDomain.setPhone("3001234567");
+        userDomain.setEmail("juan@test.com");
         userDomain.setIdRol(1);
-        userDomain.setSalarioBase(BigDecimal.valueOf(2000));
+        userDomain.setBaseSalary(BigDecimal.valueOf(2000));
 
         userEntity = new UserEntity();
         userEntity.setId(1L);
@@ -68,7 +67,7 @@ class MyReactiveRepositoryAdapterTest {
         Mono<User> result = adapter.createUser(userDomain);
 
         StepVerifier.create(result)
-                .expectNextMatches(user -> user.getCorreoElectronico().equals("juan@test.com"))
+                .expectNextMatches(user -> user.getEmail().equals("juan@test.com"))
                 .verifyComplete();
     }
 
@@ -78,7 +77,7 @@ class MyReactiveRepositoryAdapterTest {
                 .thenReturn(Mono.just(userEntity));
         when(mapper.map(userEntity, User.class)).thenReturn(userDomain);
 
-        Mono<Boolean> result = adapter.userEmailExist("juan@test.com");
+        Mono<Boolean> result = adapter.getUserByEmail("juan@test.com");
 
         StepVerifier.create(result)
                 .expectNext(true)
@@ -89,7 +88,7 @@ class MyReactiveRepositoryAdapterTest {
     void testUserEmailExist_notFound() {
         when(repository.findByCorreoElectronico("notfound@test.com")).thenReturn(Mono.empty());
 
-        Mono<Boolean> result = adapter.userEmailExist("notfound@test.com");
+        Mono<Boolean> result = adapter.getUserByEmail("notfound@test.com");
 
         StepVerifier.create(result)
                 .expectNext(false)
