@@ -2,6 +2,8 @@ package co.com.registeruser.api.GlobalExceptions;
 
 import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -14,32 +16,46 @@ import org.springframework.web.server.WebExceptionHandler;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
 @Order(-2)
 public class GlobalExceptionHandler implements WebExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
     @NonNull
     public Mono<Void> handle(@NonNull ServerWebExchange exchange, @NonNull Throwable ex) {
-        var response = exchange.getResponse();
+        ServerHttpResponse response = exchange.getResponse();
+
+        HttpStatus status;
+        Map<String, Object> errorResponse = new LinkedHashMap<>();
 
         if (ex instanceof ValidateExceptionHandler vex) {
-            var errors = vex.getError().getAllErrors().stream()
+            status = HttpStatus.BAD_REQUEST; // 400
+            errorResponse.put("error", "Bad Request");
+            errorResponse.put("messages", vex.getError().getAllErrors()
+                    .stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
-                    .toList();
-
-            return writeJson(response, HttpStatus.BAD_REQUEST, Map.of("errors", errors));
+                    .toList()
+            );
+            log.warn("Error de validación: {}", errorResponse.get("messages"));
+        } else if (ex instanceof ConflictException) {
+            status = HttpStatus.CONFLICT; // 409
+            errorResponse.put("error", "Conflict");
+            errorResponse.put("message", ex.getMessage());
+            log.warn("Error de conflicto: {}", ex.getMessage());
+        } else {
+            status = HttpStatus.INTERNAL_SERVER_ERROR; // 500
+            errorResponse.put("error", "Internal Server Error");
+            errorResponse.put("message", ex.getMessage() != null ? ex.getMessage() : "Ocurrió un error inesperado");
+            log.error("Error inesperado", ex);
         }
 
-        if (ex instanceof ConflictException) {
-            return writeJson(response, HttpStatus.CONFLICT, Map.of("message", ex.getMessage()));
-        }
-
-        return Mono.error(ex);
+        return writeJson(response, status, errorResponse);
     }
 
     private Mono<Void> writeJson(ServerHttpResponse response, HttpStatus status, Object body) {
@@ -50,8 +66,8 @@ public class GlobalExceptionHandler implements WebExceptionHandler {
             var buffer = response.bufferFactory().wrap(jsonBody.getBytes(StandardCharsets.UTF_8));
             return response.writeWith(Mono.just(buffer));
         } catch (Exception e) {
+            log.error("Error serializando la respuesta de error", e);
             return Mono.error(e);
         }
     }
-
 }
