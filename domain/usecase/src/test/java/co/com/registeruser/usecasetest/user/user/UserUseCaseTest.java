@@ -1,5 +1,6 @@
 package co.com.registeruser.usecasetest.user.user;
 
+import co.com.registeruser.model.rol.Rol;
 import co.com.registeruser.model.rol.gateways.RolRepository;
 import co.com.registeruser.model.user.User;
 import co.com.registeruser.model.user.gateways.UserRepository;
@@ -31,6 +32,7 @@ public class UserUseCaseTest {
     private UserUseCase userUseCase;
 
     private User user;
+    private Rol rol;
 
     @BeforeEach
     void setUp() {
@@ -43,6 +45,12 @@ public class UserUseCaseTest {
                 "darwin@gmail.com",
                 1,
                 BigDecimal.valueOf(5000000)
+        );
+
+        rol = new Rol(
+                1,
+                "ADMIN",
+                "Encargado de registro"
         );
     }
 
@@ -65,5 +73,16 @@ public class UserUseCaseTest {
                 .expectErrorMatches(e -> e instanceof ConflictException &&
                         e.getMessage().equals("El rol no existe"))
                 .verify();
+    }
+
+    @Test
+    void saveUser_success() {
+        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(Mono.just(false));
+        when(rolRepository.findRoleById(user.getIdRol())).thenReturn(Mono.just(rol));
+        when(userRepository.createUser(user)).thenReturn(Mono.just(user));
+
+        StepVerifier.create(userUseCase.createUser(user))
+                .expectNextMatches(savedUser -> savedUser.getEmail().equals(user.getEmail()))
+                .verifyComplete();
     }
 }

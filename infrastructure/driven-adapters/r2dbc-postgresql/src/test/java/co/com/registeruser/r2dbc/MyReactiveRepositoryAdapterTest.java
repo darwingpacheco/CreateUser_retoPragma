@@ -48,14 +48,14 @@ class MyReactiveRepositoryAdapterTest {
 
         userEntity = new UserEntity();
         userEntity.setId(1L);
-        userEntity.setNombres("Juan");
-        userEntity.setApellidos("Pérez");
-        userEntity.setFechaNacimiento(LocalDate.of(1990, 1, 1));
-        userEntity.setDireccion("Calle 123");
-        userEntity.setTelefono("3001234567");
-        userEntity.setCorreoElectronico("juan@test.com");
+        userEntity.setName("Juan");
+        userEntity.setLastName("Pérez");
+        userEntity.setDateBirth(LocalDate.of(1990, 1, 1));
+        userEntity.setAddress("Calle 123");
+        userEntity.setPhone("3001234567");
+        userEntity.setEmail("juan@test.com");
         userEntity.setIdRol(1);
-        userEntity.setSalarioBase(BigDecimal.valueOf(2000));
+        userEntity.setBaseSalary(BigDecimal.valueOf(2000));
     }
 
     @Test
