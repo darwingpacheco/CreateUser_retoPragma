@@ -33,7 +33,7 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
 
     @Override
     @Transactional
-    public Mono<Boolean> getUserByEmail(String email) {
+    public Mono<Boolean> existUserByEmail(String email) {
         return this.repository.findByCorreoElectronico(email)
                 .map(this::toEntity)
                 .map(user -> true)

@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
@@ -36,7 +36,7 @@ cors:
 adapter:
   r2dbc-postgresql:
     host: localhost
-    port: 5432
+    port: 5433
     database: createUserPragma
     username: postgres
     password: 1005076148

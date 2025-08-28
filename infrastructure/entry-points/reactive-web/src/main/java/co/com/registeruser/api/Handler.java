@@ -41,4 +41,16 @@ public class Handler {
                     }
                 });
     }
+
+    public Mono<ServerResponse> loanByEmailUser(ServerRequest request) {
+        String email = request.pathVariable("email");
+        return userUseCase.existsUserByEmail(email)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return ServerResponse.ok().build();
+                    } else {
+                        return ServerResponse.notFound().build();
+                    }
+                });
+    }
 }

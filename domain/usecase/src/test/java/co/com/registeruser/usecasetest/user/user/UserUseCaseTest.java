@@ -56,7 +56,7 @@ public class UserUseCaseTest {
 
     @Test
     void saveUser_emailIsExist(){
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(Mono.just(true));
+        when(userRepository.existUserByEmail(user.getEmail())).thenReturn(Mono.just(true));
 
         StepVerifier.create(userUseCase.createUser(user))
                 .expectErrorMatches(e -> e instanceof ConflictException &&
@@ -66,7 +66,7 @@ public class UserUseCaseTest {
 
     @Test
     void saveUser_roleNotFound(){
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(Mono.just(false));
+        when(userRepository.existUserByEmail(user.getEmail())).thenReturn(Mono.just(false));
         when(rolRepository.findRoleById(user.getIdRol())).thenReturn(Mono.empty());
 
         StepVerifier.create(userUseCase.createUser(user))
@@ -77,7 +77,7 @@ public class UserUseCaseTest {
 
     @Test
     void saveUser_success() {
-        when(userRepository.getUserByEmail(user.getEmail())).thenReturn(Mono.just(false));
+        when(userRepository.existUserByEmail(user.getEmail())).thenReturn(Mono.just(false));
         when(rolRepository.findRoleById(user.getIdRol())).thenReturn(Mono.just(rol));
         when(userRepository.createUser(user)).thenReturn(Mono.just(user));
 

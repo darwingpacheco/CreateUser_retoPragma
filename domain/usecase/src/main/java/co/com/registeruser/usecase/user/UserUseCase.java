@@ -14,7 +14,7 @@ public class UserUseCase {
     private final RolRepository rolRepository;
 
     public Mono<User> createUser(User user) {
-        return userRepository.getUserByEmail(user.getEmail())
+        return userRepository.existUserByEmail(user.getEmail())
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new ConflictException("El email ya está registrado"));
@@ -23,5 +23,9 @@ public class UserUseCase {
                             .switchIfEmpty(Mono.error(new ConflictException("El rol no existe")))
                             .flatMap(rol -> userRepository.createUser(user));
                 });
+    }
+
+    public Mono<Boolean> existsUserByEmail(String email) {
+        return userRepository.existUserByEmail(email);
     }
 }

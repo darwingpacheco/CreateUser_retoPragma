@@ -25,7 +25,7 @@ public class RouterRest {
     @RouterOperations({
             @RouterOperation(
                     path = "/api/v1/usuarios",
-                    produces = { "application/json" },
+                    produces = {"application/json"},
                     method = RequestMethod.POST,
                     beanClass = Handler.class,
                     beanMethod = "createUser",
@@ -48,6 +48,7 @@ public class RouterRest {
     })
 
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
-        return route(POST("/api/v1/usuarios"), handler::createUser);
+        return route(POST("/api/v1/usuarios"), handler::createUser)
+                .andRoute(GET("/api/v1/usuarios/email/{email}"), handler::loanByEmailUser);
     }
 }

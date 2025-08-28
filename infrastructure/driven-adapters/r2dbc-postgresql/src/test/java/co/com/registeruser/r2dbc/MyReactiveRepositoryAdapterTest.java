@@ -77,7 +77,7 @@ class MyReactiveRepositoryAdapterTest {
                 .thenReturn(Mono.just(userEntity));
         when(mapper.map(userEntity, User.class)).thenReturn(userDomain);
 
-        Mono<Boolean> result = adapter.getUserByEmail("juan@test.com");
+        Mono<Boolean> result = adapter.existUserByEmail("juan@test.com");
 
         StepVerifier.create(result)
                 .expectNext(true)
@@ -88,7 +88,7 @@ class MyReactiveRepositoryAdapterTest {
     void testUserEmailExist_notFound() {
         when(repository.findByCorreoElectronico("notfound@test.com")).thenReturn(Mono.empty());
 
-        Mono<Boolean> result = adapter.getUserByEmail("notfound@test.com");
+        Mono<Boolean> result = adapter.existUserByEmail("notfound@test.com");
 
         StepVerifier.create(result)
                 .expectNext(false)
