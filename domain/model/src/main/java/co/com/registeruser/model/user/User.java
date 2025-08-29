@@ -13,10 +13,12 @@ import java.time.LocalDate;
 public class User {
     private String name;
     private String lastName;
+    private String email;
+    private String password;
+    private String numberDocument;
+    private String phone;
     private LocalDate dateBirth;
     private String address;
-    private String phone;
-    private String email;
     private int idRol;
     private BigDecimal baseSalary;
 }

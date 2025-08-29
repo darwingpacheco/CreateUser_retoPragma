@@ -20,17 +20,23 @@ public class UserEntity {
     @Column("apellidos")
     private String lastName;
 
+    @Column("correo_electronico")
+    private String email;
+
+    @Column("clave")
+    private String password;
+
+    @Column("documento_identidad")
+    private String numberDocument;
+
+    @Column("telefono")
+    private String phone;
+
     @Column("fecha_nacimiento")
     private LocalDate dateBirth;
 
     @Column("direccion")
     private String address;
-
-    @Column("telefono")
-    private String phone;
-
-    @Column("correo_electronico")
-    private String email;
 
     @Column("id_rol")
     private int idRol;

@@ -44,6 +44,22 @@ public class RouterRest {
                                     @ApiResponse(responseCode = "200", description = "Successful operation")
                             }
                     )
+            ),
+
+            @RouterOperation(
+                    path = "/api/v1/usuarios/email/{email}",
+                    produces = {"application/json"},
+                    method = RequestMethod.GET,
+                    beanClass = Handler.class,
+                    beanMethod = "loanByEmailUser",
+                    operation = @Operation(
+                            operationId = "GetUserByEmail",
+                            summary = "Get user by email",
+                            responses = {
+                                    @ApiResponse(responseCode = "200", description = "User found"),
+                                    @ApiResponse(responseCode = "404", description = "User not found")
+                            }
+                    )
             )
     })
 
