@@ -39,10 +39,12 @@ public class UserUseCaseTest {
         user = new User(
                 "Darwin",
                 "Gomez",
+                "darwin@gmail.com",
+                "1234567890",
+                "1234567890",
+                "3224291874",
                 LocalDate.of(2003, 1, 10),
                 "Carrera 1 # 15 - 43",
-                "3224291874",
-                "darwin@gmail.com",
                 1,
                 BigDecimal.valueOf(5000000)
         );

@@ -46,3 +46,7 @@ logging:
     org.springframework.web: DEBUG
     io.r2dbc.postgresql: DEBUG
     co.com.registeruser: DEBUG
+
+jwt:
+  secret: MiClaveSuperSecreta1234567890Seguro
+  expiration: 3600

@@ -73,7 +73,7 @@ class MyReactiveRepositoryAdapterTest {
 
     @Test
     void testUserEmailExist_found() {
-        when(repository.findByCorreoElectronico("juan@test.com"))
+        when(repository.findByEmail("juan@test.com"))
                 .thenReturn(Mono.just(userEntity));
         when(mapper.map(userEntity, User.class)).thenReturn(userDomain);
 
@@ -86,7 +86,7 @@ class MyReactiveRepositoryAdapterTest {
 
     @Test
     void testUserEmailExist_notFound() {
-        when(repository.findByCorreoElectronico("notfound@test.com")).thenReturn(Mono.empty());
+        when(repository.findByEmail("notfound@test.com")).thenReturn(Mono.empty());
 
         Mono<Boolean> result = adapter.existUserByEmail("notfound@test.com");
 

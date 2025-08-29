@@ -1,5 +1,6 @@
 package co.com.registeruser.r2dbc.userReactiveRepository;
 
+import co.com.registeruser.model.authRequest.AuthRequest;
 import co.com.registeruser.model.user.User;
 import co.com.registeruser.model.user.gateways.UserRepository;
 import co.com.registeruser.r2dbc.entities.UserEntity;
@@ -34,9 +35,22 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     @Override
     @Transactional
     public Mono<Boolean> existUserByEmail(String email) {
-        return this.repository.findByCorreoElectronico(email)
+        return this.repository.findByEmail(email)
                 .map(this::toEntity)
                 .map(user -> true)
                 .defaultIfEmpty(false);
+    }
+
+    @Override
+    public Mono<User> existUserByEmailAndPassword(AuthRequest request) {
+        String email = request.getEmail();
+        String password = request.getPassword();
+        return this.repository.existUserByEmailAndPassword(email, password)
+                .map(this::toEntity);
+    }
+
+    @Override
+    public Mono<String> getRolUserByEmail(String email) {
+        return this.repository.getRolByEmail(email);
     }
 }
