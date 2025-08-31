@@ -66,6 +66,6 @@ public class RouterRest {
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/v1/usuarios"), handler::createUser)
                 .andRoute(GET("/api/v1/usuarios/email/{email}"), handler::loanByEmailUser)
-                .andRoute(POST("/api/v1/login"), handler:: login);
+                .andRoute(POST("/api/v1/login"), handler::login);
     }
 }

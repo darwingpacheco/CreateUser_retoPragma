@@ -42,10 +42,8 @@ public class MyReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
-    public Mono<User> existUserByEmailAndPassword(AuthRequest request) {
-        String email = request.getEmail();
-        String password = request.getPassword();
-        return this.repository.existUserByEmailAndPassword(email, password)
+    public Mono<User> getUserByEmail(String email) {
+        return this.repository.getUserByEmail(email)
                 .map(this::toEntity);
     }
 

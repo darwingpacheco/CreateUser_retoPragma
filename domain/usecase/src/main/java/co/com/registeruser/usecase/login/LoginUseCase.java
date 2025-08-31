@@ -16,16 +16,22 @@ public class LoginUseCase {
     private final long expirationSeconds;
 
     public Mono<AuthResponse> login(AuthRequest login) {
-        return userUseCase.existsUserByEmailAndPassword(login)
-                .flatMap(exists -> {
-                    if (!exists)
-                        return Mono.error(new ConflictException("Email o contraseña incorrectas"));
-
-                    return userUseCase.getRolUserByEmail(login.getEmail())
-                            .map(rol -> {
-                                String token = tokenGenerator.apply(login.getEmail(), rol);
-                                return new AuthResponse(login.getEmail(), token, expirationSeconds);
-                            });
+        return userUseCase.validateUser(login)
+                .flatMap(status -> {
+                    switch (status) {
+                        case USER_NOT_FOUND:
+                            return Mono.error(new ConflictException("El correo no existe"));
+                        case WRONG_PASSWORD:
+                            return Mono.error(new ConflictException("La contraseña es incorrecta"));
+                        case SUCCESS:
+                            return userUseCase.getRolUserByEmail(login.getEmail())
+                                    .map(rol -> {
+                                        String token = tokenGenerator.apply(login.getEmail(), rol);
+                                        return new AuthResponse(login.getEmail(), token, expirationSeconds);
+                                    });
+                        default:
+                            return Mono.error(new ConflictException("Error desconocido"));
+                    }
                 });
     }
 }

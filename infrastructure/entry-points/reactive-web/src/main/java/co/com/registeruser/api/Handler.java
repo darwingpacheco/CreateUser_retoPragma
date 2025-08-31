@@ -63,7 +63,7 @@ public class Handler {
         return validatorsUtils.validateRequestBody(request, LoginRequestDTO.class)
                 .doOnNext(loginRequest -> log.info("Request login: {}", loginRequest))
                 .flatMap(body -> loginUseCase.login(userMapperDTO.toLogin(body)))
-                .flatMap((AuthResponse ar) -> ServerResponse.ok().bodyValue(ar))
+                .flatMap((AuthResponse responseLogin) -> ServerResponse.ok().bodyValue(responseLogin))
                 .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue(e.getMessage()));
     }
 }

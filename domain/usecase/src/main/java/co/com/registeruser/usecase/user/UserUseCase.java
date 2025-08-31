@@ -1,8 +1,8 @@
 package co.com.registeruser.usecase.user;
 
 import co.com.registeruser.model.authRequest.AuthRequest;
-import co.com.registeruser.model.authResponse.AuthResponse;
 import co.com.registeruser.model.rol.gateways.RolRepository;
+import co.com.registeruser.model.statusCode.LoginStatus;
 import co.com.registeruser.model.user.User;
 import co.com.registeruser.model.user.gateways.UserRepository;
 import co.com.registeruser.model.util.PasswordEncrypter;
@@ -36,13 +36,15 @@ public class UserUseCase {
         return userRepository.existUserByEmail(email);
     }
 
-    public Mono<Boolean> existsUserByEmailAndPassword(AuthRequest request) {
-        return userRepository.existUserByEmailAndPassword(request)
-                .map(dbUser -> passwordEncrypter.matches(request.getPassword(), dbUser.getPassword()))
-                .defaultIfEmpty(false);
-    }
-
     public Mono<String> getRolUserByEmail(String email) {
         return userRepository.getRolUserByEmail(email);
+    }
+
+    public Mono<LoginStatus> validateUser(AuthRequest request) {
+        return userRepository.getUserByEmail(request.getEmail())
+                .map(dbUser -> passwordEncrypter.matches(request.getPassword(), dbUser.getPassword())
+                        ? LoginStatus.SUCCESS
+                        : LoginStatus.WRONG_PASSWORD)
+                .defaultIfEmpty(LoginStatus.USER_NOT_FOUND);
     }
 }

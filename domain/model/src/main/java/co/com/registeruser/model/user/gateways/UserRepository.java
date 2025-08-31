@@ -7,6 +7,6 @@ import reactor.core.publisher.Mono;
 public interface UserRepository {
     Mono<User> createUser(User user);
     Mono<Boolean> existUserByEmail(String email);
-    Mono<User> existUserByEmailAndPassword(AuthRequest request);
+    Mono<User> getUserByEmail(String email);
     Mono<String> getRolUserByEmail(String email);
 }
