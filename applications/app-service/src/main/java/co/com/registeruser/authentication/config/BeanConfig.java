@@ -1,6 +1,6 @@
 package co.com.registeruser.authentication.config;
 
-import co.com.registeruser.authentication.jwt.JWTUtil;
+import co.com.registeruser.api.jwt.JWTUtil;
 import co.com.registeruser.model.rol.gateways.RolRepository;
 import co.com.registeruser.model.user.gateways.UserRepository;
 import co.com.registeruser.model.util.PasswordEncrypter;

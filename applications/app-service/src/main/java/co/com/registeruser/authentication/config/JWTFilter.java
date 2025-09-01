@@ -1,6 +1,6 @@
 package co.com.registeruser.authentication.config;
 
-import co.com.registeruser.authentication.jwt.JWTUtil;
+import co.com.registeruser.api.jwt.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

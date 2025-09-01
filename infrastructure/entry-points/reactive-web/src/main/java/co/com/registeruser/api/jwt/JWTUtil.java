@@ -1,4 +1,4 @@
-package co.com.registeruser.authentication.jwt;
+package co.com.registeruser.api.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
