@@ -80,9 +80,11 @@ public class Handler {
                     return userUseCase.existsUserByEmail(email)
                             .flatMap(exists -> {
                                 if (exists) {
-                                    return ServerResponse.ok().build();
+                                    return ServerResponse.status(HttpStatus.OK)
+                                            .bodyValue("USER_OK");
                                 } else {
-                                    return ServerResponse.notFound().build();
+                                    return ServerResponse.status(HttpStatus.NOT_FOUND)
+                                            .bodyValue("USER_NOTFOUND");
                                 }
                             });
                 });
