@@ -73,10 +73,14 @@ public class Handler {
         String email = request.pathVariable("email");
         return securityService.extractRole(request)
                 .flatMap(rol -> {
-                    if (!"CLIENTE".equals(rol.toUpperCase())) {
+                    if (!"CLIENTE".equals(rol.toUpperCase()))
                         return ServerResponse.status(HttpStatus.FORBIDDEN)
                                 .bodyValue("No tiene permisos para solicitar un prestamo");
-                    }
+
+                    if (!securityService.extractEmail(request).equals(email))
+                        return ServerResponse.status(HttpStatus.FORBIDDEN)
+                                .bodyValue("El email del token no coincide con el email del parámetro");
+
                     return userUseCase.existsUserByEmail(email)
                             .flatMap(exists -> {
                                 if (exists) {

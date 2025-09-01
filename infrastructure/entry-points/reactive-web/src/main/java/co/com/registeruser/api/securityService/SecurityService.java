@@ -35,4 +35,14 @@ public class SecurityService {
             }
         }).subscribeOn(Schedulers.boundedElastic());
     }
+
+    public Mono<String> extractEmail(ServerRequest request) {
+        String authHeader = request.headers().firstHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Mono.error(new RuntimeException("Token inválido o ausente"));
+        }
+        String token = authHeader.replace("Bearer ", "");
+        return Mono.fromCallable(() -> jwtUtil.getEmail(token))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
 }
