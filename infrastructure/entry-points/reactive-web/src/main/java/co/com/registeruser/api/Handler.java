@@ -3,7 +3,6 @@ package co.com.registeruser.api;
 import co.com.registeruser.api.GlobalExceptions.ValidateExceptionHandler;
 import co.com.registeruser.api.dto.LoginRequestDTO;
 import co.com.registeruser.api.dto.UserRequestDTO;
-import co.com.registeruser.api.jwt.JWTUtil;
 import co.com.registeruser.api.mapper.UserMapperDTO;
 import co.com.registeruser.api.securityService.SecurityService;
 import co.com.registeruser.api.utils.ValidatorsUtils;
@@ -32,21 +31,31 @@ public class Handler {
     private final SecurityService securityService;
 
     public Mono<ServerResponse> createUser(ServerRequest request) {
-        return validatorsUtils.validateRequestBody(request, UserRequestDTO.class)
-                .doOnNext(userRequest -> log.info("Request createUser: {}", userRequest))
-                .flatMap(userRequest ->
-                        securityService.extractRole(request)
-                                .flatMap(role -> {
-                                    if ("CLIENTE".equalsIgnoreCase(role)) {
-                                        return ServerResponse.status(HttpStatus.FORBIDDEN)
-                                                .bodyValue("No tiene permisos para crear usuarios");
-                                    }
+        String token = request.headers().firstHeader("Authorization");
 
-                                    return userUseCase.createUser(userMapperDTO.toUser(userRequest))
-                                            .doOnNext(user -> log.info("Usuario creado: {}", user))
-                                            .flatMap(user -> ServerResponse.ok().bodyValue(userMapperDTO.toDto(user)));
-                                })
-                )
+        if (token == null || token.isBlank())
+            return Mono.error(new ConflictException("No se envió token de autorización"));
+
+        return securityService.validateToken(token)
+                .flatMap(valid -> {
+                    if (!valid)
+                        return Mono.error(new ConflictException("Token inválido o expirado"));
+
+                    return validatorsUtils.validateRequestBody(request, UserRequestDTO.class)
+                            .doOnNext(userRequest -> log.info("Request createUser: {}", userRequest))
+                            .flatMap(userRequest -> securityService.extractRole(request)
+                                    .flatMap(role -> {
+                                        if ("CLIENTE".equalsIgnoreCase(role)) {
+                                            return Mono.error(
+                                                    new ConflictException("No tiene permisos para crear usuarios"));
+                                        }
+
+                                        return userUseCase.createUser(userMapperDTO.toUser(userRequest))
+                                                .doOnNext(user -> log.info("Usuario creado: {}", user))
+                                                .flatMap(user -> ServerResponse.ok().bodyValue(userMapperDTO.toDto(user)));
+                                    })
+                            );
+                })
                 .doOnError(error -> {
                     if (error instanceof ValidateExceptionHandler ex) {
                         ex.getError().getAllErrors().forEach(err -> {

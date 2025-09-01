@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Component
 @RequiredArgsConstructor
@@ -15,19 +16,23 @@ public class SecurityService {
     public Mono<String> extractRole(ServerRequest request) {
         String authHeader = request.headers().firstHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return Mono.error(new RuntimeException("Token inválido o ausente"));
+                return Mono.error(new RuntimeException("Token inválido o ausente"));
         }
         String token = authHeader.replace("Bearer ", "");
         return Mono.just(jwtUtil.getRol(token));
     }
 
-    public Mono<Void> authorizeRole(ServerRequest request, String requiredRole) {
-        return extractRole(request)
-                .flatMap(role -> {
-                    if (!requiredRole.equalsIgnoreCase(role)) {
-                        return Mono.error(new RuntimeException("No tiene permisos"));
-                    }
-                    return Mono.empty(); // autorización OK
-                });
+    public Mono<Boolean> validateToken(String token) {
+        return Mono.fromCallable(() -> {
+            try {
+                String cleanToken = token.startsWith("Bearer ")
+                        ? token.substring(7)
+                        : token;
+
+                return jwtUtil.isValid(cleanToken);
+            } catch (Exception e) {
+                return false;
+            }
+        }).subscribeOn(Schedulers.boundedElastic());
     }
 }
