@@ -2,6 +2,7 @@ package co.com.registeruser.usecase.login;
 
 import co.com.registeruser.model.authRequest.AuthRequest;
 import co.com.registeruser.model.authResponse.AuthResponse;
+import co.com.registeruser.model.statusCode.LoginStatus;
 import co.com.registeruser.model.util.PasswordEncrypter;
 import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import co.com.registeruser.usecase.user.UserUseCase;
@@ -17,6 +18,7 @@ public class LoginUseCase {
 
     public Mono<AuthResponse> login(AuthRequest login) {
         return userUseCase.validateUser(login)
+                .defaultIfEmpty(LoginStatus.UNKNOWN)
                 .flatMap(status -> {
                     switch (status) {
                         case USER_NOT_FOUND:
