@@ -1,7 +1,9 @@
-package co.com.registeruser.authentication.config;
+package co.com.registeruser.api.config;
 
-import co.com.registeruser.api.jwt.JWTUtil;
+
+import co.com.registeruser.model.util.JwtGateway;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,11 +18,12 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JWTFilter implements WebFilter {
 
-    private final JWTUtil jwtUtil;
+    private final JwtGateway jwtGateway;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
@@ -28,12 +31,13 @@ public class JWTFilter implements WebFilter {
 
         if (auth != null && auth.startsWith("Bearer ")) {
             String token = auth.substring(7);
-            if (!jwtUtil.isValid(token)) {
+            if (!jwtGateway.isValid(token)) {
                 exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                 return exchange.getResponse().setComplete();
             }
-            String email = jwtUtil.getEmail(token);
-            String rol = jwtUtil.getRol(token);
+
+            String email = jwtGateway.getEmailFromToken(token);
+            String rol = jwtGateway.getRolFromToken(token);
             List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + rol));
 
             Authentication authentication =

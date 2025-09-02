@@ -5,5 +5,5 @@ import reactor.core.publisher.Mono;
 
 public interface RolRepository {
 
-    Mono<Rol> findRoleById(int idRol);
+    Mono<Boolean> findRoleById(int idRol);
 }

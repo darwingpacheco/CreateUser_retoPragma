@@ -18,5 +18,5 @@ public interface UserMapperDTO {
 
     AuthRequest toLogin(LoginRequestDTO dtoLogin);
 
-    LoginResponseDTO toDtoLogin(AuthResponse dtoLogin);
+    LoginResponseDTO toDtoLogin(AuthRequest dtoLogin);
 }

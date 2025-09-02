@@ -1,20 +1,15 @@
 package co.com.registeruser.api;
 
-import co.com.registeruser.api.GlobalExceptions.ValidateExceptionHandler;
 import co.com.registeruser.api.dto.LoginRequestDTO;
 import co.com.registeruser.api.dto.UserRequestDTO;
 import co.com.registeruser.api.mapper.UserMapperDTO;
-import co.com.registeruser.api.securityService.SecurityService;
 import co.com.registeruser.api.utils.ValidatorsUtils;
-import co.com.registeruser.model.authResponse.AuthResponse;
 import co.com.registeruser.usecase.login.LoginUseCase;
-import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import co.com.registeruser.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.validation.FieldError;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
@@ -28,69 +23,27 @@ public class Handler {
     private final LoginUseCase loginUseCase;
     private final UserMapperDTO userMapperDTO;
     private final ValidatorsUtils validatorsUtils;
-    private final SecurityService securityService;
 
     public Mono<ServerResponse> createUser(ServerRequest request) {
-        String token = request.headers().firstHeader("Authorization");
-
-        if (token == null || token.isBlank())
-            return Mono.error(new ConflictException("No se envió token de autorización"));
-
-        return securityService.validateToken(token)
-                .flatMap(valid -> {
-                    if (!valid)
-                        return Mono.error(new ConflictException("Token inválido o expirado"));
-
-                    return validatorsUtils.validateRequestBody(request, UserRequestDTO.class)
-                            .doOnNext(userRequest -> log.info("Request createUser: {}", userRequest))
-                            .flatMap(userRequest -> securityService.extractRole(request)
-                                    .flatMap(role -> {
-                                        if ("CLIENTE".equalsIgnoreCase(role)) {
-                                            return Mono.error(
-                                                    new ConflictException("No tiene permisos para crear usuarios"));
-                                        }
-
-                                        return userUseCase.createUser(userMapperDTO.toUser(userRequest))
-                                                .doOnNext(user -> log.info("Usuario creado: {}", user))
-                                                .flatMap(user -> ServerResponse.ok().bodyValue(userMapperDTO.toDto(user)));
-                                    })
-                            );
-                })
-                .doOnError(error -> {
-                    if (error instanceof ValidateExceptionHandler ex) {
-                        ex.getError().getAllErrors().forEach(err -> {
-                            log.error("Validación fallida: campo={}, mensaje={}",
-                                    ((FieldError) err).getField(),
-                                    err.getDefaultMessage());
-                        });
-                    } else {
-                        log.error("Error en createUser: {}", error.getMessage(), error);
-                    }
-                });
+        return validatorsUtils.validateRequestBody(request, UserRequestDTO.class)
+                .doOnNext(userRequest -> log.info("Request createUser: {}", userRequest))
+                .flatMap(userRequest -> userUseCase.createUser(userMapperDTO.toUser(userRequest)))
+                .doOnNext(user -> log.info("Usuario creado: {}", user))
+                .flatMap(user -> ServerResponse.status(HttpStatus.CREATED).bodyValue(userMapperDTO.toDto(user))
+                );
     }
 
     public Mono<ServerResponse> loanByEmailUser(ServerRequest request) {
         String email = request.pathVariable("email");
-        return securityService.extractRole(request)
-                .flatMap(rol -> {
-                    if (!"CLIENTE".equals(rol.toUpperCase()))
-                        return ServerResponse.status(HttpStatus.FORBIDDEN)
-                                .bodyValue("No tiene permisos para solicitar un prestamo");
-
-                    if (!securityService.extractEmail(request).equals(email))
-                        return ServerResponse.status(HttpStatus.FORBIDDEN)
-                                .bodyValue("El email del token no coincide con el email del parámetro");
-
-                    return userUseCase.existsUserByEmail(email)
-                            .flatMap(exists -> {
-                                if (exists) {
-                                    return ServerResponse.status(HttpStatus.OK)
-                                            .bodyValue("USER_OK");
-                                } else {
-                                    return ServerResponse.status(HttpStatus.NOT_FOUND)
-                                            .bodyValue("USER_NOTFOUND");
-                                }
-                            });
+        return userUseCase.existsUserByEmail(email)
+                .flatMap(exists -> {
+                    if (exists) {
+                        return ServerResponse.status(HttpStatus.OK)
+                                .bodyValue("USER_OK");
+                    } else {
+                        return ServerResponse.status(HttpStatus.NOT_FOUND)
+                                .bodyValue("USER_NOTFOUND");
+                    }
                 });
     }
 
@@ -98,7 +51,7 @@ public class Handler {
         return validatorsUtils.validateRequestBody(request, LoginRequestDTO.class)
                 .doOnNext(loginRequest -> log.info("Request login: {}", loginRequest))
                 .flatMap(body -> loginUseCase.login(userMapperDTO.toLogin(body)))
-                .flatMap((AuthResponse responseLogin) -> ServerResponse.ok().bodyValue(responseLogin))
-                .onErrorResume(e -> ServerResponse.status(HttpStatus.UNAUTHORIZED).bodyValue(e.getMessage()));
+                .flatMap(response -> ServerResponse.status(HttpStatus.OK).bodyValue(userMapperDTO.toDtoLogin(response))
+                );
     }
 }
