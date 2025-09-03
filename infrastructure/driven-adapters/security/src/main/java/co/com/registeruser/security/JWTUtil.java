@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,8 +29,13 @@ import java.util.Map;
 @ConfigurationProperties(prefix = "jwt")
 public class JWTUtil implements JwtGateway {
     private long expiration;
+    private String secret;
+    private SecretKey key;
 
-    SecretKey key = Jwts.SIG.HS512.key().build();
+    @PostConstruct
+    public void init() {
+        this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+    }
 
     @Override
     public String generateToken(User user, String rol) {

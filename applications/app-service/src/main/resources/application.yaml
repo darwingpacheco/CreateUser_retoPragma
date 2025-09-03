@@ -48,5 +48,5 @@ logging:
     co.com.registeruser: DEBUG
 
 jwt:
-  secret: MiClaveSuperSecreta1234567890Seguro
+  secret: "vN9&jLzQ2pY!7@kRc5$wXh^M3dG*oUeTzB#nKf8qVr1sLp6Y!aHc9Dg4WmZxJt2"
   expiration: 3600
