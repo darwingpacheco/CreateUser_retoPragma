@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
@@ -25,55 +26,31 @@ import java.util.Map;
 @Setter
 @ConfigurationProperties(prefix = "jwt")
 public class JWTUtil implements JwtGateway {
-    private String secret;
-
     private long expiration;
 
-    private Key key() {
-        return Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-    }
+    SecretKey key = Jwts.SIG.HS512.key().build();
 
+    @Override
     public String generateToken(String email, String rol) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(Date.from(now))
-                .setExpiration(Date.from(now.plusSeconds(expiration)))
-                .addClaims(Map.of("rol", rol))
-                .signWith(key(), SignatureAlgorithm.HS256)
+                .subject(email)
+                .claim("role", rol)
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(now.plusSeconds(expiration)))
+                .signWith(key)
                 .compact();
     }
 
-    @Override
-    public boolean isValid(String token) {
+    public Claims validateTokenAndGetClaims(String token) {
         try {
-            Jwts.parserBuilder()
-                    .setSigningKey(key())
+            return Jwts.parser()
+                    .verifyWith(key)
                     .build()
-                    .parseClaimsJws(token);
-            return true;
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (Exception e) {
-            return false;
+            return null;
         }
-    }
-
-    @Override
-    public String getEmailFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(key())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
-
-    @Override
-    public String getRolFromToken(String token) {
-        return (String) Jwts.parserBuilder()
-                .setSigningKey(key())
-                .build()
-                .parseClaimsJws(token)
-                .getBody()
-                .get("rol");
     }
 }

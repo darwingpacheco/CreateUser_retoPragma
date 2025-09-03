@@ -49,6 +49,7 @@ public class SecurityConfig {
                                 "/actuator/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasAnyRole("ADMIN", "ASESOR")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/email/*").hasAnyRole("CLIENTE")
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

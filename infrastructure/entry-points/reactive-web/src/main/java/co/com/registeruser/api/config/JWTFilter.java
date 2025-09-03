@@ -2,6 +2,9 @@ package co.com.registeruser.api.config;
 
 
 import co.com.registeruser.model.util.JwtGateway;
+import co.com.registeruser.security.JWTUtil;
+import co.com.registeruser.usecase.user.ConflictException.ConflictException;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -10,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -23,30 +28,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class JWTFilter implements WebFilter {
 
-    private final JwtGateway jwtGateway;
+    private final JWTUtil jwtUtil;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         String auth = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
 
-        if (auth != null && auth.startsWith("Bearer ")) {
-            String token = auth.substring(7);
-            if (!jwtGateway.isValid(token)) {
-                exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
-                return exchange.getResponse().setComplete();
-            }
+        if (auth == null || !auth.startsWith("Bearer "))
+            return chain.filter(exchange);
 
-            String email = jwtGateway.getEmailFromToken(token);
-            String rol = jwtGateway.getRolFromToken(token);
-            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + rol));
+        String token = auth.substring(7);
 
-            Authentication authentication =
-                    new UsernamePasswordAuthenticationToken(email, null, authorities);
+        return Mono.just(token)
+                .flatMap(this::validateAndCreateAuthentication)
+                .doOnError(e -> log.warn("Token validation failed: {}", e.getMessage()))
+                .flatMap(authentication -> {
+                    SecurityContext securityContext = new SecurityContextImpl(authentication);
+                    return chain.filter(exchange).contextWrite(ReactiveSecurityContextHolder.withSecurityContext(Mono.just(securityContext)));
+                });
+    }
 
-            return chain.filter(exchange)
-                    .contextWrite(ReactiveSecurityContextHolder.withAuthentication(authentication));
-        }
+    private Mono<Authentication> validateAndCreateAuthentication(String token) {
+        return Mono.fromCallable(() -> {
+            Claims claims = jwtUtil.validateTokenAndGetClaims(token);
 
-        return chain.filter(exchange);
+            if (claims == null)
+                throw new ConflictException("Token no valido");
+
+            String role = (String) claims.get("role");
+            List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_" + role));
+            return new UsernamePasswordAuthenticationToken(claims.getSubject(), null, authorities);
+        });
     }
 }
