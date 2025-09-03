@@ -1,8 +1,9 @@
-package co.com.registeruser.logger.encrypter;
+package co.com.registeruser.security;
 
 import co.com.registeruser.model.util.PasswordEncrypter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Component
 public class BCryptPasswordEncrypter implements PasswordEncrypter {
@@ -15,7 +16,7 @@ public class BCryptPasswordEncrypter implements PasswordEncrypter {
     }
 
     @Override
-    public boolean matches(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+    public Mono<Boolean> matches(String rawPassword, String encodedPassword) {
+        return Mono.just(passwordEncoder.matches(rawPassword, encodedPassword));
     }
 }

@@ -50,12 +50,4 @@ public class UserUseCase {
     public Mono<String> getRolUserByEmail(String email) {
         return userRepository.getRolUserByEmail(email);
     }
-
-    public Mono<LoginStatus> validateUser(AuthRequest request) {
-        return userRepository.getUserByEmail(request.getEmail())
-                .map(dbUser -> passwordEncrypter.matches(request.getPassword(), dbUser.getPassword())
-                        ? LoginStatus.SUCCESS
-                        : LoginStatus.WRONG_PASSWORD)
-                .defaultIfEmpty(LoginStatus.USER_NOT_FOUND);
-    }
 }

@@ -1,5 +1,6 @@
 package co.com.registeruser.security;
 
+import co.com.registeruser.model.user.User;
 import co.com.registeruser.model.util.JwtGateway;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
@@ -31,10 +32,12 @@ public class JWTUtil implements JwtGateway {
     SecretKey key = Jwts.SIG.HS512.key().build();
 
     @Override
-    public String generateToken(String email, String rol) {
+    public String generateToken(User user, String rol) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .subject(email)
+                .subject(user.getEmail())
+                .claim("UserId", user.getIdRol())
+                .claim("name", user.getName() + " " + user.getLastName())
                 .claim("role", rol)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(expiration)))
