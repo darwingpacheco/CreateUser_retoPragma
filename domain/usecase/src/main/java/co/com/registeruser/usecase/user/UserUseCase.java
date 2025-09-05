@@ -1,8 +1,6 @@
 package co.com.registeruser.usecase.user;
 
-import co.com.registeruser.model.authRequest.AuthRequest;
 import co.com.registeruser.model.rol.gateways.RolRepository;
-import co.com.registeruser.model.statusCode.LoginStatus;
 import co.com.registeruser.model.user.User;
 import co.com.registeruser.model.user.gateways.UserRepository;
 import co.com.registeruser.model.util.LoggerGateway;
@@ -33,21 +31,26 @@ public class UserUseCase {
                 })
                 .flatMap(rolExist -> {
                     if (!rolExist) {
-                        log.error("El rol con id {} no existe ", user.getIdRol());
+                        log.error("El rol con id {} no existe", user.getIdRol());
                         return Mono.error(new ConflictException(VALID_ROLE_EXISTS));
                     }
-                    user.setPassword(passwordEncrypter.encode(user.getPassword()));
-                    return userRepository.createUser(user)
-                            .doOnSuccess(createdUser -> log.info("Usuario creado con id: {}", createdUser.getUserID()));
-                });
 
+                    user.setPassword(passwordEncrypter.encode(user.getPassword()));
+
+                    log.info("Usuario creado: ", user.getEmail());
+                    return userRepository.createUser(user);
+                });
     }
 
-    public Mono<Boolean> existsUserByEmail(String email) {
-        return userRepository.existUserByEmail(email);
+    public Mono<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     public Mono<String> getRolUserByEmail(String email) {
         return userRepository.getRolUserByEmail(email);
+    }
+
+    public Mono<User> getUserToReport(String email) {
+        return userRepository.getAllUser(email);
     }
 }

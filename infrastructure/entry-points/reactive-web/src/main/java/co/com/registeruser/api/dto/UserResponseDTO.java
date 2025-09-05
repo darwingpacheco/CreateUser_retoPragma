@@ -5,11 +5,8 @@ import java.time.LocalDate;
 
 public record UserResponseDTO(String name,
                               String lastName,
-                              LocalDate dateBirth,
-                              String address,
-                              String phone,
                               String email,
-                              int idRol,
+                              String numberDocument,
                               BigDecimal baseSalary
                             ) {
 

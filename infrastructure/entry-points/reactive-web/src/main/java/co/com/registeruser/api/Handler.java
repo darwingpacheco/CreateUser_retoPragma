@@ -2,20 +2,26 @@ package co.com.registeruser.api;
 
 import co.com.registeruser.api.dto.LoginRequestDTO;
 import co.com.registeruser.api.dto.UserRequestDTO;
+import co.com.registeruser.api.dto.UserResponseDTO;
 import co.com.registeruser.api.mapper.UserMapperDTO;
 import co.com.registeruser.api.utils.ValidatorsUtils;
 import co.com.registeruser.security.JWTUtil;
 import co.com.registeruser.usecase.login.LoginUseCase;
+import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import co.com.registeruser.usecase.user.UserUseCase;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+
+import static co.com.registeruser.model.user.util.ResponseCodesError.EMAIL_NOT_EXIST;
+import static co.com.registeruser.model.user.util.ResponseCodesError.USER_NOT_MATCH;
 
 @Slf4j
 @Component
@@ -46,19 +52,11 @@ public class Handler {
         String emailToken = claims.getSubject();
 
         if (!emailToken.equals(email))
-            return ServerResponse.status(HttpStatus.CONFLICT)
-                    .bodyValue("USER_NOT_MATCH");
+            return ServerResponse.status(HttpStatus.CONFLICT).bodyValue(USER_NOT_MATCH);
 
-        return userUseCase.existsUserByEmail(email)
-                .flatMap(exists -> {
-                    if (exists) {
-                        return ServerResponse.status(HttpStatus.OK)
-                                .bodyValue("USER_OK");
-                    } else {
-                        return ServerResponse.status(HttpStatus.NOT_FOUND)
-                                .bodyValue("USER_NOTFOUND");
-                    }
-                });
+        return userUseCase.findByEmail(email)
+                .switchIfEmpty(Mono.error(new ConflictException(EMAIL_NOT_EXIST)))
+                .flatMap(exists -> ServerResponse.ok().build());
     }
 
     public Mono<ServerResponse> login(ServerRequest request) {
@@ -67,5 +65,15 @@ public class Handler {
                 .flatMap(body -> loginUseCase.login(userMapperDTO.toLogin(body)))
                 .flatMap(response -> ServerResponse.status(HttpStatus.OK).bodyValue(userMapperDTO.toDtoLogin(response))
                 );
+    }
+
+    public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
+        String email = serverRequest.pathVariable("email");
+        log.info("Received request to get all users");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(userUseCase.getUserToReport(email).map(userMapperDTO::toDto), UserResponseDTO.class)
+                .doOnSuccess(users -> log.info("Successfully retrieved all users"))
+                .doOnError(error -> log.error("Error retrieving users: {}", error.getMessage()));
     }
 }
