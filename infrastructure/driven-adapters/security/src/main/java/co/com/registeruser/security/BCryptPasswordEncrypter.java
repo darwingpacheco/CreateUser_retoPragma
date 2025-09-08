@@ -1,6 +1,6 @@
 package co.com.registeruser.security;
 
-import co.com.registeruser.model.util.PasswordEncrypter;
+import co.com.registeruser.model.jwtUtil.PasswordEncrypter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;

@@ -20,8 +20,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
-import static co.com.registeruser.model.user.util.ResponseCodesError.EMAIL_NOT_EXIST;
-import static co.com.registeruser.model.user.util.ResponseCodesError.USER_NOT_MATCH;
+import static co.com.registeruser.model.constants.ResponseCodesError.EMAIL_NOT_EXIST;
+import static co.com.registeruser.model.constants.ResponseCodesError.USER_NOT_MATCH;
 
 @Slf4j
 @Component

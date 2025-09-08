@@ -1,4 +1,4 @@
-package co.com.registeruser.model.util;
+package co.com.registeruser.model.jwtUtil;
 
 public interface LoggerGateway {
 

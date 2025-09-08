@@ -1,19 +1,18 @@
 package co.com.registeruser.usecase.login;
 
 import co.com.registeruser.model.authRequest.AuthRequest;
-import co.com.registeruser.model.authResponse.AuthResponse;
-import co.com.registeruser.model.rol.gateways.RolRepository;
-import co.com.registeruser.model.statusCode.LoginStatus;
+import co.com.registeruser.model.jwtUtil.JwtGateway;
+import co.com.registeruser.model.jwtUtil.LoggerGateway;
+import co.com.registeruser.model.jwtUtil.PasswordEncrypter;
 import co.com.registeruser.model.user.gateways.UserRepository;
-import co.com.registeruser.model.util.JwtGateway;
-import co.com.registeruser.model.util.LoggerGateway;
-import co.com.registeruser.model.util.PasswordEncrypter;
 import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import co.com.registeruser.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-import static co.com.registeruser.model.user.util.Constants.*;
+import static co.com.registeruser.model.constants.Constants.ROLE_NOT_EXISTS;
+import static co.com.registeruser.model.constants.Constants.USER_NOT_FOUND;
+import static co.com.registeruser.model.constants.ResponseCodesError.INVALID_ACCESS;
 
 @RequiredArgsConstructor
 public class LoginUseCase {
@@ -35,11 +34,11 @@ public class LoginUseCase {
                         .flatMap(match -> {
                             if (!match) {
                                 log.warn("Credenciales incorrectas para el usuario con email: {}", login.getEmail());
-                                return Mono.error(new ConflictException("Credenciales incorrectas"));
+                                return Mono.error(new ConflictException(INVALID_ACCESS));
                             }
 
                             return userUseCase.getRolUserByEmail(user.getEmail())
-                                    .switchIfEmpty(Mono.error(new ConflictException("Rol no encontrado")))
+                                    .switchIfEmpty(Mono.error(new ConflictException(ROLE_NOT_EXISTS)))
                                     .map(role -> {
                                         String token = jwtGateway.generateToken(user, role);
                                         login.setToken(token);

@@ -1,16 +1,16 @@
 package co.com.registeruser.usecase.user;
 
+import co.com.registeruser.model.jwtUtil.LoggerGateway;
+import co.com.registeruser.model.jwtUtil.PasswordEncrypter;
 import co.com.registeruser.model.rol.gateways.RolRepository;
 import co.com.registeruser.model.user.User;
 import co.com.registeruser.model.user.gateways.UserRepository;
-import co.com.registeruser.model.util.LoggerGateway;
-import co.com.registeruser.model.util.PasswordEncrypter;
 import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Mono;
 
-import static co.com.registeruser.model.user.util.Constants.VALID_EMAIL_DUPLICATE;
-import static co.com.registeruser.model.user.util.Constants.VALID_ROLE_EXISTS;
+import static co.com.registeruser.model.constants.Constants.VALID_EMAIL_DUPLICATE;
+import static co.com.registeruser.model.constants.Constants.VALID_ROLE_EXISTS;
 
 @RequiredArgsConstructor
 public class UserUseCase {

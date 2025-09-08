@@ -1,4 +1,4 @@
-package co.com.registeruser.model.user.util;
+package co.com.registeruser.model.constants;
 
 import lombok.experimental.UtilityClass;
 

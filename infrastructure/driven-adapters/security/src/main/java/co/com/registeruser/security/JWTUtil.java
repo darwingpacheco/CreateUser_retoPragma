@@ -1,26 +1,21 @@
 package co.com.registeruser.security;
 
 import co.com.registeruser.model.user.User;
-import co.com.registeruser.model.util.JwtGateway;
+import co.com.registeruser.model.jwtUtil.JwtGateway;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Map;
 
 @Component
 @NoArgsConstructor

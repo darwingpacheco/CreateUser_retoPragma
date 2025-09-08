@@ -1,14 +1,12 @@
 package co.com.registeruser.api.config;
 
 
-import co.com.registeruser.model.util.JwtGateway;
 import co.com.registeruser.security.JWTUtil;
 import co.com.registeruser.usecase.user.ConflictException.ConflictException;
 import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

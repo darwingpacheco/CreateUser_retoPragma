@@ -1,6 +1,6 @@
 package co.com.registeruser.logger.useCaseLogger;
 
-import co.com.registeruser.model.util.LoggerGateway;
+import co.com.registeruser.model.jwtUtil.LoggerGateway;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

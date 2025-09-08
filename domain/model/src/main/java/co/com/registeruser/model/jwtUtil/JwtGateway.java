@@ -1,4 +1,4 @@
-package co.com.registeruser.model.util;
+package co.com.registeruser.model.jwtUtil;
 
 import co.com.registeruser.model.user.User;
 
