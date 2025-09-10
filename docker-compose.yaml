@@ -1,18 +1,4 @@
-version: '3.8'
-
 services:
-
-  authentication-app:
-    image: authentication:latest
-    container_name: authentication-app
-    depends_on:
-      - db-auth
-    environment:
-      SPRING_PROFILES_ACTIVE: docker
-    ports:
-      - "8081:8081"
-    networks:
-      - app-network
 
   db-auth:
     image: postgres:15-alpine
@@ -22,11 +8,38 @@ services:
       POSTGRES_PASSWORD: 1005076148
       POSTGRES_DB: createUserPragma
     ports:
-      - "5433:5432"
+      - "5432:5432"
     volumes:
       - db-auth-data:/var/lib/postgresql/data
     networks:
       - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  authentication-app:
+    build:
+      context: .
+      dockerfile: deployment/Dockerfile
+    container_name: authentication-app
+    depends_on:
+      db-auth:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SPRING_R2DBC_URL: r2dbc:postgresql://db-auth:5432/createUserPragma
+      SPRING_R2DBC_USERNAME: postgres
+      SPRING_R2DBC_PASSWORD: 1005076148
+    ports:
+      - "8081:8081"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   db-auth-data:

@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: createUser
+    name: createUserPragma
   devtools:
     add-properties: false
   h2:
