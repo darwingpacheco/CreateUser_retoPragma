@@ -49,7 +49,8 @@ public class SecurityConfig {
                                 "/actuator/**"
                         ).permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasAnyRole("ADMIN", "ASESOR")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/email/*").hasAnyRole("CLIENTE")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/create/email/*").hasAnyRole("CLIENTE")
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/updateLoan/email/*").hasAnyRole("ASESOR")
                         .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/all/*").hasAnyRole("ASESOR")
                         .anyExchange().authenticated()
                 )

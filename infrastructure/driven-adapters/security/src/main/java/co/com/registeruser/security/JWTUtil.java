@@ -47,14 +47,10 @@ public class JWTUtil implements JwtGateway {
     }
 
     public Claims validateTokenAndGetClaims(String token) {
-        try {
             return Jwts.parser()
                     .verifyWith(key)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload();
-        } catch (Exception e) {
-            return null;
-        }
     }
 }

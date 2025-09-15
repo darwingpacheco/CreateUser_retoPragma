@@ -76,4 +76,9 @@ public class Handler {
                 .doOnSuccess(users -> log.info("Successfully retrieved all users"))
                 .doOnError(error -> log.error("Error retrieving users: {}", error.getMessage()));
     }
+
+    public Mono<ServerResponse> validateToken(ServerRequest serverRequest) {
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON).build();
+    }
 }

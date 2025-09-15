@@ -190,8 +190,9 @@ public class RouterRest {
 
     public RouterFunction<ServerResponse> routerFunction(Handler handler) {
         return route(POST("/api/v1/usuarios"), handler::createUser)
-                .andRoute(GET("/api/v1/usuarios/email/{email}"), handler::loanByEmailUser)
+                .andRoute(GET("/api/v1/usuarios/create/email/{email}"), handler::loanByEmailUser)
                 .andRoute(POST("/api/v1/login"), handler::login)
-                .andRoute(GET("/api/v1/usuarios/all/{email}"), handler::getAllUsers);
+                .andRoute(GET("/api/v1/usuarios/all/{email}"), handler::getAllUsers)
+                .andRoute(GET("/api/v1/usuarios/updateLoan/email/{email}"), handler::validateToken);
     }
 }
