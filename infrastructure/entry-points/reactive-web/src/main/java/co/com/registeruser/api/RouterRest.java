@@ -193,6 +193,7 @@ public class RouterRest {
                 .andRoute(GET("/api/v1/usuarios/create/email/{email}"), handler::loanByEmailUser)
                 .andRoute(POST("/api/v1/login"), handler::login)
                 .andRoute(GET("/api/v1/usuarios/all/{email}"), handler::getAllUsers)
+                .andRoute(GET("/api/v1/usuarios/autoValidate/{email}"), handler::getAllUsers)
                 .andRoute(GET("/api/v1/usuarios/updateLoan/email/{email}"), handler::validateToken);
     }
 }
