@@ -61,6 +61,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonar
 
+      - name: Ver report-task
+        if: always()
+        run: cat build/sonar/report-task.txt
+
       - name: Quality Gate SonarQube
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
