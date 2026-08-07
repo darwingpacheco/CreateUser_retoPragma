@@ -23,7 +23,7 @@ sonar {
     properties {
         property "sonar.host.url", "https://sonarcloud.io"
         property "sonar.organization", "darwingpacheco"
-        property "sonar.projectKey", "CreateUser_retoPragma"
+        property "sonar.projectKey", "darwingpacheco_CreateUser_retoPragma"
 
         property "sonar.sourceEncoding", "UTF-8"
         property "sonar.modules", "${modules.join(',')}"
