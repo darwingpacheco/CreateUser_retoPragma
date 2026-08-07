@@ -50,26 +50,8 @@ jobs:
           path: '**/build/test-results/test/*.xml'
           reporter: java-junit
 
-      - name: Verificar token Sonar
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          if [ -z "$SONAR_TOKEN" ]; then
-            echo "❌ SONAR_TOKEN está vacío"
-          else
-            echo "✅ SONAR_TOKEN tiene valor, longitud: ${#SONAR_TOKEN}"
-          fi
-
-      - name: Test token SonarCloud
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          curl -s -u $SONAR_TOKEN: \
-            "https://sonarcloud.io/api/projects/search?projects=darwingpacheco_CreateUser_retoPragma&organization=darwingpacheco" \
-            | python3 -c "import sys,json; d=json.load(sys.stdin); print('Proyecto encontrado:', d['paging']['total'] > 0)"
-
       - name: Analisis SonarQube
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew sonar -Dsonar.qualitygate.wait=true
+        run: ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.token=${{ secrets.SONAR_TOKEN }}
