@@ -61,12 +61,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: ./gradlew sonar
 
-      - name: Buscar report-task
-        if: always()
-        run: find . -name "report-task.txt" 2>/dev/null
-
       - name: Quality Gate SonarQube
         uses: sonarsource/sonarqube-quality-gate-action@master
         timeout-minutes: 5
+        with:
+          scanMetadataReportFile: build/sonar/report-task.txt
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN}}
