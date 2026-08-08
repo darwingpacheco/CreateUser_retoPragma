@@ -54,4 +54,4 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonar -Dsonar.qualitygate.wait=true -Dsonar.login=${{ secrets.SONAR_TOKEN }}
