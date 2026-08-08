@@ -63,6 +63,18 @@ jobs:
             -Dsonar.organization=darwingpacheco \
             -Dsonar.host.url=https://sonarcloud.io \
             -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
-            -Dsonar.qualitygate.wait=true \
             -Dsonar.java.binaries=**/build/classes/java/main \
             -Dsonar.coverage.jacoco.xmlReportPaths=**/build/reports/jacoco/test/jacocoTestReport.xml
+
+      - name: Quality Gate SonarQube
+        run: |
+          sleep 10
+          STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=darwingpacheco_CreateUser_retoPragma" \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['projectStatus']['status'])")
+          echo "Quality Gate: $STATUS"
+          if [ "$STATUS" != "OK" ]; then
+            echo "❌ Quality Gate failed: $STATUS"
+            exit 1
+          fi
+          echo "✅ Quality Gate passed"
