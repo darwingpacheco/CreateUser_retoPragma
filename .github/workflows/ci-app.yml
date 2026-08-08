@@ -68,9 +68,29 @@ jobs:
 
       - name: Quality Gate SonarQube
         run: |
-          sleep 10
+          TASK_ID=$(grep "ceTaskId=" .scannerwork/report-task.txt | cut -d'=' -f2)
+          BRANCH=$(grep "dashboardUrl=" .scannerwork/report-task.txt | python3 -c "
+          import sys, urllib.parse
+          url = sys.stdin.read().split('dashboardUrl=')[1].strip()
+          params = dict(urllib.parse.parse_qs(urllib.parse.urlparse(url).query))
+          print(params.get('branch', [''])[0])
+          ")
+          PROJECT_KEY=$(grep "projectKey=" .scannerwork/report-task.txt | cut -d'=' -f2)
+          
+          echo "Esperando que SonarCloud procese el análisis..."
+          while true; do
+            TASK_STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+              "https://sonarcloud.io/api/ce/task?id=$TASK_ID" \
+              | python3 -c "import sys,json; print(json.load(sys.stdin)['task']['status'])")
+            echo "Task status: $TASK_STATUS"
+            if [ "$TASK_STATUS" = "SUCCESS" ] || [ "$TASK_STATUS" = "FAILED" ] || [ "$TASK_STATUS" = "CANCELLED" ]; then
+              break
+            fi
+            sleep 3
+          done
+          
           STATUS=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
-            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=darwingpacheco_CreateUser_retoPragma" \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=$PROJECT_KEY&branch=$BRANCH" \
             | python3 -c "import sys,json; print(json.load(sys.stdin)['projectStatus']['status'])")
           echo "Quality Gate: $STATUS"
           if [ "$STATUS" != "OK" ]; then
