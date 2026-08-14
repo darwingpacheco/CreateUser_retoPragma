@@ -26,6 +26,9 @@ import java.nio.charset.StandardCharsets;
 public class SecurityConfig {
 
     private final JWTFilter jwtFilter;
+    private static final String roleAsesor = "ASESOR";
+    private static final String roleAdmin = "ADMIN";
+    private static final String roleCliente = "CLIENTE";
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -48,12 +51,12 @@ public class SecurityConfig {
                                 "/proxy/**",
                                 "/actuator/**"
                         ).permitAll()
-                        .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasAnyRole("ADMIN", "ASESOR")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/create/email/*").hasAnyRole("CLIENTE")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/updateLoan/email/*").hasAnyRole("ASESOR")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/validateToken/reports").hasAnyRole("ASESOR")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/autoValidate/email/*").hasAnyRole("CLIENTE")
-                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/all/*").hasAnyRole("ASESOR")
+                        .pathMatchers(HttpMethod.POST, "/api/v1/usuarios").hasAnyRole(roleAdmin, roleAsesor)
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/create/email/*").hasAnyRole(roleCliente)
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/updateLoan/email/*").hasAnyRole(roleAsesor)
+                        .pathMatchers(HttpMethod.GET, "/api/v1/validateToken/reports").hasAnyRole(roleAsesor)
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/autoValidate/email/*").hasAnyRole()
+                        .pathMatchers(HttpMethod.GET, "/api/v1/usuarios/all/*").hasAnyRole(roleAsesor)
                         .anyExchange().authenticated()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling

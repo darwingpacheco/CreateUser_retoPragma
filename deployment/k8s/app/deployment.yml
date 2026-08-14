@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: createuser-app
+  namespace: createuser
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: createuser-app
+  template:
+    metadata:
+      labels:
+        app: createuser-app
+    spec:
+      containers:
+        - name: createuser-app
+          image: createuser-app:1.0
+          ports:
+            - containerPort: 8081
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: db-secret
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8081
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8081
+            initialDelaySeconds: 60
+            periodSeconds: 15
