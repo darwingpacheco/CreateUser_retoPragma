@@ -1,0 +1,25 @@
+services:
+  db-auth:
+    image: postgres:15
+    container_name: db-auth
+    environment:
+      POSTGRES_DB: createUserPragma
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1005076148
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    image: createuser-app:1.0
+    container_name: createuser-app
+    ports:
+      - "8081:8081"
+    depends_on:
+      - db-auth
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+
+volumes:
+  postgres_data:

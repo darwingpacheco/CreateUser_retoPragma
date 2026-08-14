@@ -1,9 +1,9 @@
 server:
-  port: 8080
+  port: 8081
 
 spring:
   application:
-    name: createUser
+    name: createUserPragma
   devtools:
     add-properties: false
   h2:
@@ -36,7 +36,7 @@ cors:
 adapter:
   r2dbc-postgresql:
     host: localhost
-    port: 5432
+    port: 5433
     database: createUserPragma
     username: postgres
     password: 1005076148
@@ -46,3 +46,7 @@ logging:
     org.springframework.web: DEBUG
     io.r2dbc.postgresql: DEBUG
     co.com.registeruser: DEBUG
+
+jwt:
+  secret: "vN9&jLzQ2pY!7@kRc5$wXh^M3dG*oUeTzB#nKf8qVr1sLp6Y!aHc9Dg4WmZxJt2"
+  expiration: 3600

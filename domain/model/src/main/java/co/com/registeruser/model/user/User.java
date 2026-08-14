@@ -11,11 +11,15 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private String nombres;
-    private String apellidos;
-    private LocalDate fechaNacimiento;
-    private String direccion;
-    private String telefono;
-    private String correoElectronico;
-    private BigDecimal salarioBase;
+    private Long userID;
+    private String name;
+    private String lastName;
+    private String email;
+    private String password;
+    private String numberDocument;
+    private String phone;
+    private LocalDate dateBirth;
+    private String address;
+    private int idRol;
+    private BigDecimal baseSalary;
 }

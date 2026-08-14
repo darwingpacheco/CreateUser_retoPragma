@@ -1,78 +1,97 @@
 package co.com.registeruser.r2dbc;
 
+import co.com.registeruser.model.user.User;
+import co.com.registeruser.r2dbc.entities.UserEntity;
+import co.com.registeruser.r2dbc.userReactiveRepository.MyReactiveRepository;
+import co.com.registeruser.r2dbc.userReactiveRepository.MyReactiveRepositoryAdapter;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.reactivecommons.utils.ObjectMapper;
-import org.springframework.data.domain.Example;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MyReactiveRepositoryAdapterTest {
-    // TODO: change four you own tests
+    @Mock
+    private MyReactiveRepository repository;
+
+    @Mock
+    private ObjectMapper mapper;
 
     @InjectMocks
-    MyReactiveRepositoryAdapter repositoryAdapter;
+    private MyReactiveRepositoryAdapter adapter;
 
-    @Mock
-    MyReactiveRepository repository;
+    private User userDomain;
+    private UserEntity userEntity;
 
-    @Mock
-    ObjectMapper mapper;
-
+//    @BeforeEach
+//    void setUp() {
+//        userDomain = new User();
+//        userDomain.setName("Juan");
+//        userDomain.setLastName("Pérez");
+//        userDomain.setDateBirth(LocalDate.of(1990, 1, 1));
+//        userDomain.setAddress("Calle 123");
+//        userDomain.setPhone("3001234567");
+//        userDomain.setEmail("juan@test.com");
+//        userDomain.setIdRol(1);
+//        userDomain.setBaseSalary(BigDecimal.valueOf(2000));
+//
+//        userEntity = new UserEntity();
+//        userEntity.setId(1L);
+//        userEntity.setName("Juan");
+//        userEntity.setLastName("Pérez");
+//        userEntity.setDateBirth(LocalDate.of(1990, 1, 1));
+//        userEntity.setAddress("Calle 123");
+//        userEntity.setPhone("3001234567");
+//        userEntity.setEmail("juan@test.com");
+//        userEntity.setIdRol(1);
+//        userEntity.setBaseSalary(BigDecimal.valueOf(2000));
+//    }
+//
 //    @Test
-//    void mustFindValueById() {
+//    void testCreateUser_success() {
+//        when(repository.save(any(UserEntity.class))).thenReturn(Mono.just(userEntity));
+//        when(mapper.map(userEntity, User.class)).thenReturn(userDomain);
+//        when(mapper.map(userDomain, UserEntity.class)).thenReturn(userEntity);
 //
-//        when(repository.findById("1")).thenReturn(Mono.just("test"));
-//        when(mapper.map("test", Object.class)).thenReturn("test");
-//
-//        Mono<Object> result = repositoryAdapter.findById("1");
+//        Mono<User> result = adapter.createUser(userDomain);
 //
 //        StepVerifier.create(result)
-//                .expectNextMatches(value -> value.equals("test"))
+//                .expectNextMatches(user -> user.getEmail().equals("juan@test.com"))
 //                .verifyComplete();
 //    }
 //
 //    @Test
-//    void mustFindAllValues() {
-//        when(repository.findAll()).thenReturn(Flux.just("test"));
-//        when(mapper.map("test", Object.class)).thenReturn("test");
+//    void testUserEmailExist_found() {
+//        when(repository.findByEmail("juan@test.com"))
+//                .thenReturn(Mono.just(userEntity));
+//        when(mapper.map(userEntity, User.class)).thenReturn(userDomain);
 //
-//        Flux<Object> result = repositoryAdapter.findAll();
+//        Mono<Boolean> result = adapter.findByEmail("juan@test.com");
 //
 //        StepVerifier.create(result)
-//                .expectNextMatches(value -> value.equals("test"))
+//                .expectNext(true)
 //                .verifyComplete();
 //    }
 //
 //    @Test
-//    void mustFindByExample() {
-//        when(repository.findAll(any(Example.class))).thenReturn(Flux.just("test"));
-//        when(mapper.map("test", Object.class)).thenReturn("test");
+//    void testUserEmailExist_notFound() {
+//        when(repository.findByEmail("notfound@test.com")).thenReturn(Mono.empty());
 //
-//        Flux<Object> result = repositoryAdapter.findByExample("test");
-//
-//        StepVerifier.create(result)
-//                .expectNextMatches(value -> value.equals("test"))
-//                .verifyComplete();
-//    }
-//
-//    @Test
-//    void mustSaveValue() {
-//        when(repository.save("test")).thenReturn(Mono.just("test"));
-//        when(mapper.map("test", Object.class)).thenReturn("test");
-//
-//        Mono<Object> result = repositoryAdapter.save("test");
+//        Mono<Boolean> result = adapter.findByEmail("notfound@test.com");
 //
 //        StepVerifier.create(result)
-//                .expectNextMatches(value -> value.equals("test"))
+//                .expectNext(false)
 //                .verifyComplete();
 //    }
 }
